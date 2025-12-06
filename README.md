@@ -1,6 +1,9 @@
 # id_pair_set
 
-A Dart package that provides an efficient way to store and manage sets of ID pairs, ensuring uniqueness by ID type.
+[![pub package](https://img.shields.io/pub/v/id_pair_set.svg)](https://pub.dev/packages/id_pair_set)
+[![License](https://img.shields.io/github/license/staylorx/id_pair_set)](https://github.com/staylorx/id_pair_set/blob/main/LICENSE)
+
+A Dart package that provides an efficient way to store and manage sets of ID pairs, ensuring uniqueness by ID type. Ideal for handling multiple identifiers for entities like books (ISBN, UPC, EAN) or products, with built-in immutability and serialization support.
 
 ## Features
 
@@ -9,8 +12,9 @@ A Dart package that provides an efficient way to store and manage sets of ID pai
 - **Type-Based Filtering**: Retrieve pairs by specific `idType` using `getByType`.
 - **Serialization**: Convert the set to a sorted string format for storage or comparison (e.g., in databases).
 - **Equatable Support**: Built-in equality checks using the `equatable` package.
+- **Flexible ID Types**: Supports dynamic `idType` (e.g., String, enum) for versatile use cases.
 
-## Getting Started
+## Installation
 
 Add `id_pair_set` to your `pubspec.yaml`:
 
@@ -19,17 +23,27 @@ dependencies:
   id_pair_set: ^1.0.0
 ```
 
-Import the package:
+Then run:
 
-```dart
-import 'package:id_pair_set/id_pair_set.dart';
+```bash
+dart pub get
+```
+
+Or if using Flutter:
+
+```bash
+flutter pub get
 ```
 
 ## Usage
 
+### Implementing IdPair
+
 First, implement the `IdPair` abstract class:
 
 ```dart
+import 'package:id_pair_set/id_pair_set.dart';
+
 class MyIdPair extends IdPair {
   @override
   final String idType;
@@ -54,27 +68,142 @@ class MyIdPair extends IdPair {
 }
 ```
 
-Create and manage an `IdPairSet`:
+### Creating and Managing IdPairSet
+
+Create an `IdPairSet` instance:
 
 ```dart
 final pairs = [
   MyIdPair('isbn', '978-3-16-148410-0'),
   MyIdPair('upc', '123456789012'),
-  MyIdPair('isbn', '978-1-23-456789-0'), // duplicate type, keeps last
+  MyIdPair('isbn', '978-1-23-456789-0'), // duplicate type, keeps last by default
 ];
 
-final idSet = IdPairSet(pairs); // keeps last by default
+final idSet = IdPairSet(pairs); // keeps last occurrence of duplicates
+```
 
-// Add a new pair
+#### Adding Pairs
+
+```dart
 final updatedSet = idSet.addPair(MyIdPair('ean', '1234567890123'));
+```
 
-// Get pairs by type
-final isbnPairs = idSet.getByType('isbn');
+#### Removing Pairs
 
-// Serialize to string
+```dart
+final pairToRemove = MyIdPair('upc', '123456789012');
+final reducedSet = idSet.removePair(pairToRemove);
+```
+
+#### Filtering by Type
+
+```dart
+final isbnPairs = idSet.getByType('isbn'); // Returns IdPairSet with only ISBN pairs
+```
+
+#### Serialization
+
+```dart
 print(idSet.toString()); // e.g., "ean:1234567890123|isbn:978-1-23-456789-0|upc:123456789012"
 ```
 
-## Additional Information
+#### Keeping First Instead of Last
 
-This package is useful for scenarios where you need to handle multiple identifiers for entities (e.g., books with ISBN, UPC, EAN codes) and ensure no duplicates by type. The `keepLast` parameter controls whether to keep the first or last pair when duplicates are encountered.
+```dart
+final keepFirstSet = IdPairSet(pairs, keepLast: false); // Keeps first occurrence of duplicates
+```
+
+## API Overview
+
+### IdPair
+
+Abstract base class for ID pairs.
+
+**Properties:**
+- `dynamic idType`: The type of the ID (e.g., 'isbn', 'upc').
+- `String idCode`: The actual ID code.
+- `bool isValid`: Whether the pair is valid.
+- `String displayName`: Human-readable representation.
+
+**Methods:**
+- `IdPair copyWith({dynamic idType, String? idCode})`: Creates a copy with optional property changes.
+
+### IdPairSet<T extends IdPair>
+
+Immutable set of ID pairs with uniqueness by `idType`.
+
+**Constructor:**
+- `IdPairSet(List<T> pairs, {bool keepLast = true})`: Creates a set from a list of pairs. `keepLast` determines whether to keep the last or first duplicate.
+
+**Methods:**
+- `IdPairSet<T> addPair(T pair)`: Returns a new set with the pair added.
+- `IdPairSet<T> removePair(T pair)`: Returns a new set with the pair removed.
+- `IdPairSet<T> getByType(dynamic type)`: Returns a new set containing only pairs of the specified type.
+- `String toString()`: Returns a sorted string representation (e.g., "type1:code1|type2:code2").
+
+**Properties:**
+- `List<T> idPairs`: The list of unique pairs.
+- `bool keepLast`: Whether duplicates keep the last occurrence.
+
+## Examples
+
+### Complete Example
+
+```dart
+import 'package:id_pair_set/id_pair_set.dart';
+
+class ProductId extends IdPair {
+  @override
+  final String idType;
+  @override
+  final String idCode;
+
+  ProductId(this.idType, this.idCode);
+
+  @override
+  List<Object?> get props => [idType, idCode];
+
+  @override
+  bool get isValid => idCode.isNotEmpty;
+
+  @override
+  String get displayName => '$idType: $idCode';
+
+  @override
+  IdPair copyWith({dynamic idType, String? idCode}) {
+    return ProductId(idType ?? this.idType, idCode ?? this.idCode);
+  }
+}
+
+void main() {
+  final ids = [
+    ProductId('isbn', '978-3-16-148410-0'),
+    ProductId('upc', '123456789012'),
+    ProductId('isbn', '978-1-23-456789-0'), // duplicate
+  ];
+
+  final idSet = IdPairSet(ids);
+
+  print('All IDs: ${idSet.toString()}');
+  print('ISBN only: ${idSet.getByType('isbn').toString()}');
+
+  final withEan = idSet.addPair(ProductId('ean', '1234567890123'));
+  print('With EAN: ${withEan.toString()}');
+}
+```
+
+## Contributing
+
+Contributions are welcome! Please see the [contributing guide](https://github.com/staylorx/id_pair_set/blob/main/CONTRIBUTING.md) for details.
+
+## Issues and Feedback
+
+If you find a bug or have a feature request, please file an issue on [GitHub](https://github.com/staylorx/id_pair_set/issues).
+
+## Changelog
+
+See the [CHANGELOG.md](https://github.com/staylorx/id_pair_set/blob/main/CHANGELOG.md) for recent changes.
+
+## License
+
+This package is licensed under the MIT License. See [LICENSE](https://github.com/staylorx/id_pair_set/blob/main/LICENSE) for details.

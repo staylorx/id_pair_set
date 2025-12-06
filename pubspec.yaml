@@ -1,7 +1,9 @@
 name: id_pair_set
 description: A way to store pairs of IDs efficiently.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/staylorx/id_pair_set
+issue_tracker: https://github.com/staylorx/id_pair_set/issues
+documentation: https://github.com/staylorx/id_pair_set
 
 environment:
   sdk: ^3.10.0

@@ -21,7 +21,10 @@ class TestIdPair extends IdPair {
 
   @override
   IdPair copyWith({dynamic idType, String? idCode}) {
-    return TestIdPair((idType as String?) ?? this.idType, idCode ?? this.idCode);
+    return TestIdPair(
+      (idType as String?) ?? this.idType,
+      idCode ?? this.idCode,
+    );
   }
 }
 
