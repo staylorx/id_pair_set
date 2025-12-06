@@ -58,13 +58,7 @@ class IdPairSet<T extends IdPair> with EquatableMixin {
   }
 
   /// Returns a unique string identifier for this IdPairSet, derived from its contents.
-  /// The format is "idType1:idCode1|idType2:idCode2|...".
-  /// If the set is empty, returns an empty string.
-  /// Used for identification and serialization,
-  /// e.g., in databases or when comparing entities.
-  /// The pairs are sorted by idType name to ensure consistent ordering.
-  /// Example: "isbn:978-3-16-148410-0|local:12345"
-  /// Useful for noSql databases where uuid or the like can be used as key.
+  /// The format is "idType1:idCode1|idType2:idCode2|...". Pairs are sorted by idType.
   @override
   String toString() {
     if (idPairs.isNotEmpty) {

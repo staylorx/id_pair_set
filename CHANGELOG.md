@@ -1,3 +1,8 @@
+## [1.0.1] - 2025-12-06
+
+### Changed
+- Updated documentation.
+
 ## [1.0.0] - 2025-12-06
 
 ### Added
