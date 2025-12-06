@@ -1,13 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'id_pair.dart';
 
+/// An immutable set of unique [IdPair] instances, keyed by type.
 class IdPairSet<T extends IdPair> with EquatableMixin {
   final List<T> idPairs;
   final bool keepLast;
 
+  /// Creates an [IdPairSet] from a list of pairs, ensuring uniqueness.
   IdPairSet(List<T> pairs, {this.keepLast = true})
     : idPairs = _unique(pairs, keepLast);
 
+  /// Returns a list of unique pairs, keeping the last occurrence if [keepLast] is true.
   static List<T> _unique<T extends IdPair>(List<T> pairs, bool keepLast) {
     final uniquePairs = <dynamic, T>{};
 
@@ -57,8 +60,7 @@ class IdPairSet<T extends IdPair> with EquatableMixin {
     );
   }
 
-  /// Returns a unique string identifier for this IdPairSet, derived from its contents.
-  /// The format is "idType1:idCode1|idType2:idCode2|...". Pairs are sorted by idType.
+  /// Returns a string representation in the format "type:code|type:code|...".
   @override
   String toString() {
     if (idPairs.isNotEmpty) {

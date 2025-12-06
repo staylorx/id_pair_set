@@ -1,6 +1,6 @@
 name: id_pair_set
-description: A Dart package providing an immutable data structure for managing unique ID pairs by type, with features for filtering, serialization, and validation. Ideal for product catalogs and functional programming.
-version: 1.0.1
+description: A Dart package providing an immutable data structure for managing unique ID pairs by type, with features for filtering, serialization, and validation.
+version: 1.0.2
 repository: https://github.com/staylorx/id_pair_set
 issue_tracker: https://github.com/staylorx/id_pair_set/issues
 documentation: https://github.com/staylorx/id_pair_set
