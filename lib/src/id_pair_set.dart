@@ -3,7 +3,10 @@ import 'id_pair.dart';
 
 /// An immutable set of unique [IdPair] instances, keyed by type.
 class IdPairSet<T extends IdPair> with EquatableMixin {
+  /// The list of unique ID pairs in this set.
   final List<T> idPairs;
+
+  /// Whether to keep the last occurrence of duplicate ID types; true by default.
   final bool keepLast;
 
   /// Creates an [IdPairSet] from a list of pairs, ensuring uniqueness.

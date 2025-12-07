@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 /// Abstract class for identifier pairs with type and code.
 /// Subclasses must implement [idType], [idCode], [isValid], [displayName], and [copyWith].
 abstract class IdPair with EquatableMixin {
+  /// Creates a new IdPair instance.
+  IdPair();
+
   /// The type of this ID pair.
   dynamic get idType;
 

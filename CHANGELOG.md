@@ -1,3 +1,8 @@
+## [1.0.3] - 2025-12-06
+
+### Changed
+- Updated documentation. I _really_ want those pub.dev points.
+
 ## [1.0.2] - 2025-12-06
 
 ### Changed
