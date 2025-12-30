@@ -60,7 +60,7 @@ class BookService {
     final book = Book.create(title, ids);
 
     // Register with global uniqueness check
-    registry.register(book.ids);
+    registry.register(idPairSet: book.ids);
 
     // Persist if registration succeeds
     await repository.save(book);
@@ -70,7 +70,7 @@ class BookService {
 
   /// Removes a book
   Future<void> removeBook(Book book) async {
-    registry.unregister(book.ids);
+    registry.unregister(idPairSet: book.ids);
     await repository.delete(book);
   }
 
@@ -165,6 +165,6 @@ void main() async {
   // Remove a book
   await bookService.removeBook(book1);
   print(
-    '\nAfter removing first book, registered ISBNs: ${registry.getRegisteredCodes('isbn')}',
+    '\nAfter removing first book, registered ISBNs: ${registry.getRegisteredCodes(idType: 'isbn')}',
   );
 }
