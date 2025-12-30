@@ -37,13 +37,13 @@ void main() {
 
       final set2 = IdPairSet([TestId('isbn', '789'), TestId('local', 'abc')]);
 
-      expect(() => registry.register(set1), returnsNormally);
-      expect(() => registry.register(set2), returnsNormally);
+      expect(() => registry.register(idPairSet: set1), returnsNormally);
+      expect(() => registry.register(idPairSet: set2), returnsNormally);
 
-      expect(registry.isRegistered('isbn', '123'), isTrue);
-      expect(registry.isRegistered('isbn', '789'), isTrue);
-      expect(registry.isRegistered('local', 'abc'), isTrue);
-      expect(registry.isRegistered('upc', '456'), isTrue);
+      expect(registry.isRegistered(idType: 'isbn', idCode: '123'), isTrue);
+      expect(registry.isRegistered(idType: 'isbn', idCode: '789'), isTrue);
+      expect(registry.isRegistered(idType: 'local', idCode: 'abc'), isTrue);
+      expect(registry.isRegistered(idType: 'upc', idCode: '456'), isTrue);
     });
 
     test(
@@ -52,9 +52,9 @@ void main() {
         final set1 = IdPairSet([TestId('isbn', '123')]);
         final set2 = IdPairSet([TestId('isbn', '123')]); // duplicate
 
-        registry.register(set1);
+        registry.register(idPairSet: set1);
         expect(
-          () => registry.register(set2),
+          () => registry.register(idPairSet: set2),
           throwsA(isA<DuplicateIdException>()),
         );
       },
@@ -63,33 +63,62 @@ void main() {
     test('should unregister identifiers', () {
       final set = IdPairSet([TestId('isbn', '123'), TestId('local', 'abc')]);
 
-      registry.register(set);
-      expect(registry.isRegistered('isbn', '123'), isTrue);
-      expect(registry.isRegistered('local', 'abc'), isTrue);
+      registry.register(idPairSet: set);
+      expect(registry.isRegistered(idType: 'isbn', idCode: '123'), isTrue);
+      expect(registry.isRegistered(idType: 'local', idCode: 'abc'), isTrue);
 
-      registry.unregister(set);
-      expect(registry.isRegistered('isbn', '123'), isFalse);
-      expect(registry.isRegistered('local', 'abc'), isFalse);
+      registry.unregister(idPairSet: set);
+      expect(registry.isRegistered(idType: 'isbn', idCode: '123'), isFalse);
+      expect(registry.isRegistered(idType: 'local', idCode: 'abc'), isFalse);
     });
 
     test('should return registered codes for type', () {
       final set1 = IdPairSet([TestId('isbn', '123')]);
       final set2 = IdPairSet([TestId('isbn', '456')]);
 
-      registry.register(set1);
-      registry.register(set2);
+      registry.register(idPairSet: set1);
+      registry.register(idPairSet: set2);
 
-      expect(registry.getRegisteredCodes('isbn'), containsAll(['123', '456']));
-      expect(registry.getRegisteredCodes('local'), isEmpty);
+      expect(
+        registry.getRegisteredCodes(idType: 'isbn'),
+        containsAll(['123', '456']),
+      );
+      expect(registry.getRegisteredCodes(idType: 'local'), isEmpty);
     });
 
     test('should clear all registrations', () {
       final set = IdPairSet([TestId('isbn', '123')]);
-      registry.register(set);
-      expect(registry.isRegistered('isbn', '123'), isTrue);
+      registry.register(idPairSet: set);
+      expect(registry.isRegistered(idType: 'isbn', idCode: '123'), isTrue);
 
       registry.clear();
-      expect(registry.isRegistered('isbn', '123'), isFalse);
+      expect(registry.isRegistered(idType: 'isbn', idCode: '123'), isFalse);
+    });
+
+    test('should set and generate autoincrement IDs', () {
+      registry.setGenerationType(
+        idType: 'local',
+        type: IdGenerationType.autoincrement,
+      );
+
+      expect(registry.generateId(idType: 'local'), '0');
+      expect(registry.generateId(idType: 'local'), '1');
+      expect(registry.generateId(idType: 'local'), '2');
+    });
+
+    test('should generate UUID IDs', () {
+      registry.setGenerationType(idType: 'local', type: IdGenerationType.uuid);
+
+      final id1 = registry.generateId(idType: 'local');
+      final id2 = registry.generateId(idType: 'local');
+
+      // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where y is 8,9,a,b
+      final uuidRegex = RegExp(
+        r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+      );
+      expect(uuidRegex.hasMatch(id1), isTrue);
+      expect(uuidRegex.hasMatch(id2), isTrue);
+      expect(id1, isNot(equals(id2)));
     });
   });
 }

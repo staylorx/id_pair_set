@@ -88,25 +88,25 @@ class Library {
 
   /// Adds an author to the library.
   void addAuthor(Author author) {
-    registry.register(author.ids);
+    registry.register(idPairSet: author.ids);
     authors.add(author);
   }
 
   /// Adds a book to the library.
   void addBook(Book book) {
-    registry.register(book.ids);
+    registry.register(idPairSet: book.ids);
     books.add(book);
   }
 
   /// Removes an author from the library.
   void removeAuthor(Author author) {
-    registry.unregister(author.ids);
+    registry.unregister(idPairSet: author.ids);
     authors.remove(author);
   }
 
   /// Removes a book from the library.
   void removeBook(Book book) {
-    registry.unregister(book.ids);
+    registry.unregister(idPairSet: book.ids);
     books.remove(book);
   }
 
@@ -189,5 +189,7 @@ void main() {
     print('Error adding duplicate ISBN: $e');
   }
 
-  print('Registered ISBNs: ${library.registry.getRegisteredCodes('isbn')}');
+  print(
+    'Registered ISBNs: ${library.registry.getRegisteredCodes(idType: 'isbn')}',
+  );
 }
