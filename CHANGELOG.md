@@ -1,3 +1,12 @@
+## [1.2.0] - 2025-12-30
+
+### Removed
+- `IdRegistry` class and `DuplicateIdException` have been moved to a separate `id_registry` package.
+- Removed `IdRegistry` export and related functionality.
+
+### Changed
+- Updated documentation to reference the `id_registry` package for global uniqueness features.
+
 ## [1.1.0] - 2025-12-30
 
 ### Added

@@ -4,4 +4,3 @@ library;
 export 'src/exceptions.dart';
 export 'src/id_pair.dart';
 export 'src/id_pair_set.dart';
-export 'src/id_registry.dart';
