@@ -80,19 +80,34 @@ class Book {
   String toString() => 'Book(title: $title, ids: ${ids.toString()})';
 }
 
-/// Manages a collection of Authors and Books.
+/// Manages a collection of Authors and Books with global uniqueness for all ids.
 class Library {
+  final IdRegistry registry = IdRegistry();
   final List<Author> authors = [];
   final List<Book> books = [];
 
   /// Adds an author to the library.
   void addAuthor(Author author) {
+    registry.register(author.ids);
     authors.add(author);
   }
 
   /// Adds a book to the library.
   void addBook(Book book) {
+    registry.register(book.ids);
     books.add(book);
+  }
+
+  /// Removes an author from the library.
+  void removeAuthor(Author author) {
+    registry.unregister(author.ids);
+    authors.remove(author);
+  }
+
+  /// Removes a book from the library.
+  void removeBook(Book book) {
+    registry.unregister(book.ids);
+    books.remove(book);
   }
 
   @override
@@ -162,4 +177,17 @@ void main() {
   print(
     '\nAuthor with duplicate ID type: ${authorWithDuplicate.ids.getByType('name')}',
   );
+
+  // Demonstrate global uniqueness enforcement
+  print('\nDemonstrating global uniqueness:');
+  try {
+    final duplicateBook = Book('Duplicate Book', [
+      BookId('isbn', '978-0316066525'), // Same ISBN as book1
+    ]);
+    library.addBook(duplicateBook);
+  } catch (e) {
+    print('Error adding duplicate ISBN: $e');
+  }
+
+  print('Registered ISBNs: ${library.registry.getRegisteredCodes('isbn')}');
 }

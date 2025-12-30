@@ -13,6 +13,7 @@ A Dart package that provides an efficient way to store and manage sets of ID pai
 - **Serialization**: Convert the set to a sorted string format for storage or comparison (e.g., in databases).
 - **Equatable Support**: Built-in equality checks using the `equatable` package.
 - **Flexible ID Types**: Supports dynamic `idType` (e.g., String, enum) for versatile use cases.
+- **Global Uniqueness Enforcement**: Use `IdRegistry` to enforce uniqueness across multiple sets for specific idTypes (e.g., ISBN, LOCAL), throwing exceptions on conflicts.
 
 ## Installation
 
@@ -113,6 +114,31 @@ print(idSet.toString()); // e.g., "ean:1234567890123|isbn:978-1-23-456789-0|upc:
 final keepFirstSet = IdPairSet(pairs, keepLast: false); // Keeps first occurrence of duplicates
 ```
 
+### Global Uniqueness with IdRegistry
+
+For scenarios requiring uniqueness across multiple `IdPairSet` instances (e.g., ensuring no duplicate ISBNs across all books), use `IdRegistry`:
+
+```dart
+import 'package:id_pair_set/id_pair_set.dart';
+
+// Create registry with unique types
+final registry = IdRegistry({'isbn', 'local'});
+
+// Register sets (throws DuplicateIdException on conflicts)
+registry.register(book1.ids);
+registry.register(book2.ids);
+
+// Unregister when removing
+registry.unregister(book1.ids);
+
+// Check if registered
+if (registry.isRegistered('isbn', '978-1234567890')) {
+  // Handle duplicate
+}
+```
+
+See the [clean architecture example](example/clean_architecture_example.dart) for a complete implementation.
+
 ## API Overview
 
 ### IdPair
@@ -144,6 +170,23 @@ Immutable set of ID pairs with uniqueness by `idType`.
 **Properties:**
 - `List<T> idPairs`: The list of unique pairs.
 - `bool keepLast`: Whether duplicates keep the last occurrence.
+
+### IdRegistry
+
+Manages global uniqueness across multiple `IdPairSet` instances for specified idTypes.
+
+**Constructor:**
+- `IdRegistry(Set<String> uniqueTypes)`: Creates a registry that enforces uniqueness for the given types.
+
+**Methods:**
+- `void register(IdPairSet set)`: Registers a set, throwing `DuplicateIdException` on conflicts.
+- `void unregister(IdPairSet set)`: Unregisters a set, removing its unique identifiers.
+- `bool isRegistered(String idType, String idCode)`: Checks if an idType/idCode combination is registered.
+- `Set<String> getRegisteredCodes(String idType)`: Returns all registered codes for an idType.
+- `void clear()`: Clears all registrations.
+
+**Exceptions:**
+- `DuplicateIdException`: Thrown when attempting to register a conflicting identifier.
 
 ## Contributing
 
