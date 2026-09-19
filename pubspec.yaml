@@ -18,5 +18,40 @@ dependencies:
 
 dev_dependencies:
   lints: ^6.0.0
+  melos: ^8.8.0
   shouldly: ^0.5.0+1
   test: ^1.25.6
+
+melos:
+  # Single-package repo: the package is the workspace root, so Melos must be
+  # told to treat the root as a package. No melos.yaml — configuration belongs
+  # here, in the pubspec.
+  useRootAsPackage: true
+  scripts:
+    analyze:
+      description: Static analysis, zero diagnostics of any severity.
+      run: dart analyze --fatal-infos --fatal-warnings
+    format:
+      description: Formats the package.
+      run: dart format .
+    format-check:
+      description: Fails when anything is unformatted (what CI runs).
+      run: dart format --output=none --set-exit-if-changed .
+    test:
+      description: Runs the test suite.
+      run: dart test
+    example:
+      description: Runs the example.
+      run: dart run example/main.dart
+    pub-check:
+      description: Reports what pub.dev would see (publish dry-run).
+      run: dart pub publish --dry-run
+    verify:
+      description: The whole gate — formatting, analysis, tests.
+      run: dart format --output=none --set-exit-if-changed . && dart analyze --fatal-infos --fatal-warnings && dart test
+    doc:
+      description: Builds the API reference into doc/api.
+      run: dart doc
+    outdated:
+      description: Lists dependencies with newer versions available.
+      run: dart pub outdated

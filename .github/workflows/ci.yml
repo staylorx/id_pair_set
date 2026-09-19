@@ -13,17 +13,19 @@ jobs:
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
 
+      # Every step runs the same melos script a human runs locally, so a broken
+      # script fails the build instead of quietly rotting.
       - name: Formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart run melos run format-check
 
       - name: Analyze (zero diagnostics of any severity)
-        run: dart analyze --fatal-infos --fatal-warnings
+        run: dart run melos run analyze
 
       - name: Test
-        run: dart test
+        run: dart run melos run test
 
       - name: Run the example
-        run: dart run example/main.dart
+        run: dart run melos run example
 
       - name: What pub.dev would see
-        run: dart pub publish --dry-run
+        run: dart run melos run pub-check
