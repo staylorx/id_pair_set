@@ -138,7 +138,7 @@ class IdPairSet<T extends IdPair<Object>> extends Equatable {
   /// do not share a name.
   Map<String, dynamic> toJson() => {
     for (final entry in _byType.entries)
-      idTypeKey(entry.key): entry.value.idCode,
+      idTypeKey(idType: entry.key): entry.value.idCode,
   };
 
   /// A stable rendering of `type:code` joined by `|`.

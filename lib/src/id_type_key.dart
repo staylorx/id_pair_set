@@ -2,4 +2,5 @@
 ///
 /// One definition, used by `IdPairSet.toJson` and by anything that keys ids by
 /// type, so a stored key and a looked-up key cannot drift apart.
-String idTypeKey(Object idType) => idType is Enum ? idType.name : '$idType';
+String idTypeKey({required Object idType}) =>
+    idType is Enum ? idType.name : '$idType';
