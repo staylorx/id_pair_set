@@ -1,80 +1,160 @@
 import 'package:equatable/equatable.dart';
+
+import 'duplicate_policy.dart';
 import 'id_pair.dart';
+import 'id_type_key.dart';
+import 'simple_id_pair.dart';
 
-/// An immutable set of unique [IdPair] instances, keyed by type.
-class IdPairSet<T extends IdPair> with EquatableMixin {
-  /// The list of unique ID pairs in this set.
-  final List<T> idPairs;
-
-  /// Whether to keep the last occurrence of duplicate ID types; true by default.
-  final bool keepLast;
-
-  /// Creates an [IdPairSet] from a list of pairs, ensuring uniqueness.
-  IdPairSet(List<T> pairs, {this.keepLast = true})
-    : idPairs = _unique(pairs, keepLast);
-
-  /// Returns a list of unique pairs, keeping the last occurrence if [keepLast] is true.
-  static List<T> _unique<T extends IdPair>(List<T> pairs, bool keepLast) {
-    final uniquePairs = <dynamic, T>{};
-
-    if (keepLast) {
-      for (final pair in pairs) {
-        uniquePairs[pair.idType] = pair;
+/// An immutable set of [IdPair]s holding at most one id per id type.
+///
+/// Nothing is dropped quietly: a pair displaced by a duplicate id type is
+/// reported by [duplicates], so a loader can refuse the data while a merge can
+/// see which occurrence lost. Equality is by content, not by insertion order.
+class IdPairSet<T extends IdPair<Object>> extends Equatable {
+  /// Builds a set from [pairs], resolving a repeated id type with [policy].
+  factory IdPairSet(
+    Iterable<T> pairs, {
+    DuplicatePolicy policy = DuplicatePolicy.lastWins,
+  }) {
+    final byType = <Object, T>{};
+    final duplicates = <T>[];
+    for (final pair in pairs) {
+      final existing = byType[pair.idType];
+      if (existing == null) {
+        byType[pair.idType] = pair;
+        continue;
       }
-    } else {
-      for (final pair in pairs) {
-        if (!uniquePairs.containsKey(pair.idType)) {
-          uniquePairs[pair.idType] = pair;
-        }
+      if (policy == DuplicatePolicy.lastWins) {
+        duplicates.add(existing);
+        byType[pair.idType] = pair;
+      } else {
+        duplicates.add(pair);
       }
     }
-
-    return uniquePairs.values.toList();
+    return IdPairSet<T>._(byType, duplicates, policy);
   }
 
-  /// Returns a new IdPairSet with the specified pair added.
-  IdPairSet<T> addPair(T pair) {
-    if (keepLast) {
-      return IdPairSet([
-        ...idPairs.where((p) => p.idType != pair.idType),
-        pair,
-      ], keepLast: keepLast);
-    } else {
-      if (idPairs.any((p) => p.idType == pair.idType)) {
-        return this;
-      }
-      return IdPairSet([...idPairs, pair], keepLast: keepLast);
+  /// Builds a string-keyed set from a `{idType: idCode}` JSON object.
+  static IdPairSet<SimpleIdPair> fromPlainJson(
+    Map<String, dynamic> json, {
+    DuplicatePolicy policy = DuplicatePolicy.lastWins,
+  }) {
+    final pairs = <SimpleIdPair>[];
+    for (final entry in json.entries) {
+      final code = _codeFromWire(entry.value);
+      if (code == null) continue;
+      pairs.add(SimpleIdPair(entry.key, code));
     }
+    return IdPairSet<SimpleIdPair>(pairs, policy: policy);
   }
 
-  /// Returns a new IdPairSet with the specified pair removed.
-  IdPairSet<T> removePair(T pair) {
-    return IdPairSet(
-      idPairs.where((p) => p != pair).toList(),
-      keepLast: keepLast,
-    );
+  /// Builds a set from a `{idType: idCode}` JSON object, one pair per entry.
+  ///
+  /// [pairFromJson] maps the stored type key and code back onto the pair type —
+  /// the key is an enum's value name, or `toString()` for any other type;
+  /// entries whose value is null are skipped.
+  factory IdPairSet.fromJson(
+    Map<String, dynamic> json, {
+    required T Function(String idType, String idCode) pairFromJson,
+    DuplicatePolicy policy = DuplicatePolicy.lastWins,
+  }) {
+    final pairs = <T>[];
+    for (final entry in json.entries) {
+      final code = _codeFromWire(entry.value);
+      if (code == null) continue;
+      pairs.add(pairFromJson(entry.key, code));
+    }
+    return IdPairSet<T>(pairs, policy: policy);
   }
 
-  /// Returns a new IdPairSet containing only pairs with the specified idType.
-  IdPairSet<T> getByType(dynamic type) {
-    return IdPairSet(
-      idPairs.where((p) => p.idType == type).toList(),
-      keepLast: keepLast,
-    );
+  IdPairSet._(this._byType, this._duplicates, this._policy);
+
+  final Map<Object, T> _byType;
+  final List<T> _duplicates;
+  final DuplicatePolicy _policy;
+
+  /// The policy applied when two pairs share an id type.
+  DuplicatePolicy get policy => _policy;
+
+  /// The pairs held, in first-seen id type order.
+  List<T> get pairs => List<T>.unmodifiable(_byType.values);
+
+  /// Every pair displaced by a duplicate id type, in the order it was seen.
+  List<T> get duplicates => List<T>.unmodifiable(_duplicates);
+
+  /// Whether any pair was displaced by a duplicate id type.
+  bool get hasDuplicates => _duplicates.isNotEmpty;
+
+  /// The id types held, in first-seen order.
+  List<Object> get idTypes => List<Object>.unmodifiable(_byType.keys);
+
+  /// The number of pairs held.
+  int get length => _byType.length;
+
+  /// Whether the set holds no pairs.
+  bool get isEmpty => _byType.isEmpty;
+
+  /// Whether the set holds at least one pair.
+  bool get isNotEmpty => _byType.isNotEmpty;
+
+  /// The pair registered under [idType], or null when that type is absent.
+  T? operator [](Object idType) => _byType[idType];
+
+  /// Whether a pair is registered under [idType].
+  bool containsType(Object idType) => _byType.containsKey(idType);
+
+  /// Whether [pair] is registered, matched on id type and code together.
+  bool contains(T pair) => _byType[pair.idType] == pair;
+
+  /// Whether any registered pair carries [idCode], whatever its type.
+  bool containsCode(String idCode) =>
+      _byType.values.any((pair) => pair.idCode == idCode);
+
+  /// Returns a set holding [pair], replacing any pair of the same id type.
+  IdPairSet<T> add(T pair) =>
+      IdPairSet<T>._({..._byType, pair.idType: pair}, _duplicates, _policy);
+
+  /// Returns a set holding every pair in [pairs], later pairs winning by type.
+  IdPairSet<T> addAll(Iterable<T> pairs) =>
+      pairs.fold(this, (set, pair) => set.add(pair));
+
+  /// Returns a set without [pair], matched on id type and code together.
+  IdPairSet<T> remove(T pair) {
+    if (_byType[pair.idType] != pair) return this;
+    return removeType(pair.idType);
   }
 
-  /// Returns a string representation in the format "type:code|type:code|...".
+  /// Returns a set without whatever pair is registered under [idType].
+  IdPairSet<T> removeType(Object idType) {
+    if (!_byType.containsKey(idType)) return this;
+    final next = Map<Object, T>.of(_byType)..remove(idType);
+    return IdPairSet<T>._(next, _duplicates, _policy);
+  }
+
+  /// Encodes the set as a JSON object of `{idType: idCode}`.
+  ///
+  /// An enum id type is written as its value name (`bally`), anything else as
+  /// `toString()`, so keys are unique as long as the types mixed into one set
+  /// do not share a name.
+  Map<String, dynamic> toJson() => {
+    for (final entry in _byType.entries)
+      idTypeKey(entry.key): entry.value.idCode,
+  };
+
+  /// A stable rendering of `type:code` joined by `|`.
+  ///
+  /// Display only — a code may contain the separators, so this is not a wire
+  /// format. Use [toJson] to persist a set and [fromPlainJson] to read it back.
   @override
   String toString() {
-    if (idPairs.isNotEmpty) {
-      final sorted = List<T>.from(idPairs)
-        ..sort((a, b) => a.idType.toString().compareTo(b.idType.toString()));
-      return sorted.map((p) => '${p.idType.toString()}:${p.idCode}').join('|');
-    } else {
-      return '';
-    }
+    final entries = _byType.entries.toList()
+      ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
+    return entries.map((e) => '${e.key}:${e.value.idCode}').join('|');
   }
 
   @override
-  List<Object?> get props => [idPairs];
+  List<Object?> get props => [Map<Object, T>.unmodifiable(_byType)];
 }
+
+/// Reads a stored code, treating a missing entry as absent rather than empty.
+String? _codeFromWire(Object? value) => value == null ? null : '$value';

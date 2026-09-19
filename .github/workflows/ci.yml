@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
+
+      - name: Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze (zero diagnostics of any severity)
+        run: dart analyze --fatal-infos --fatal-warnings
+
+      - name: Test
+        run: dart test
+
+      - name: Run the example
+        run: dart run example/main.dart
+
+      - name: What pub.dev would see
+        run: dart pub publish --dry-run
