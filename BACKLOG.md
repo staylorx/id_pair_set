@@ -87,8 +87,11 @@ code and the Bible disagree and either side may be the wrong one.
   and is not a direct dependency, so nothing to do until those move. Re-check on
   the next toolchain bump.
 
-- [ ] **No `.gitattributes`.** The repo sets no git-level line-ending policy, so
+- [x] **No `.gitattributes`.** The repo sets no git-level line-ending policy, so
   a Windows checkout that renormalizes would commit CRLF for every file. Add
   `* text=auto eol=lf` plus one `git add --renormalize .` pass. Not a Bible rule
   — it is this shop's house rule, so it belongs in its own commit rather than
-  folded into a docs change.
+  folded into a docs change. **Done 2026-09-24:** `.gitattributes` added with
+  `* text=auto eol=lf`; `git add --renormalize .` touched no tracked blob (the
+  tree was already all-LF), so the change is purely prospective — no CRLF can
+  enter the index from here on.

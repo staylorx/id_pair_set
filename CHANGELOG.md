@@ -13,6 +13,10 @@ Documentation only — no source, test or packaging change.
   --dry-run` (0 warnings) — so no build problem entered the backlog.
 - `equatable` stays pinned at `^2.1.0`. 3.0.0 is published, but the Bible's STACK
   pins `equatable ^2.x`; the upgrade waits on that pin, not on this package.
+- Added `.gitattributes` (`* text=auto eol=lf`) so the repo enforces LF at the
+  git boundary on every platform. `git add --renormalize .` changed no tracked
+  blob — the tree was already all-LF — so this is a prospective guard only and
+  touches no existing content.
 
 ## 2.0.0 - 2026-09-19
 
