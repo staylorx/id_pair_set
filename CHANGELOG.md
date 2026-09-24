@@ -1,3 +1,19 @@
+## Unreleased
+
+Documentation only — no source, test or packaging change.
+
+### Notes
+- A Windows-lane build and Bible audit (Dart 3.13.1) added the deviation list to
+  BACKLOG.md. Every item is flagged for review and deliberately not auto-fixed: a
+  deviation is a place where the code and the Bible disagree, and either side may
+  be the wrong one.
+- The gate is green on Windows — `dart pub get`, `dart format
+  --set-exit-if-changed`, `dart analyze --fatal-infos --fatal-warnings` (zero
+  diagnostics), `dart test` (20 tests), the example, and `dart pub publish
+  --dry-run` (0 warnings) — so no build problem entered the backlog.
+- `equatable` stays pinned at `^2.1.0`. 3.0.0 is published, but the Bible's STACK
+  pins `equatable ^2.x`; the upgrade waits on that pin, not on this package.
+
 ## 2.0.0 - 2026-09-19
 
 Rebuilt so a catalog, a loader or a diff gate can trust the value.
