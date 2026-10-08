@@ -52,9 +52,8 @@ code and the Bible disagree and either side may be the wrong one.
   way (it presents neither tuples nor exceptions) and ships no AGENTS.md, so the
   deviation is currently undeclared at the repo level.
   **Done 2026-10-08:** `AGENTS.md` added — doctrine pointer, the loud error-style
-  declaration, this repo's deviations, and local wiring; `BIBLE_COMPLIANCE.md`
-  added as the rule-by-rule ledger. Remaining open deviations below are
-  cross-referenced there.
+  declaration, this repo's deviations, and local wiring. The remaining open
+  deviations are the items below.
 
 - [ ] **Deviation: lib/src/simple_id_pair.dart** - `SimpleIdPair(this.idType,
   this.idCode)` takes two positional parameters; Bible §2/§4 allow positional

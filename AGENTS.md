@@ -50,7 +50,8 @@ it is not silence, it is the choice.
 - **Cross-repo:** `id_registry` builds on this package — publish a version here
   first.
 
-## Compliance ledger
+## Open deviations
 
-`BIBLE_COMPLIANCE.md` is the rule-by-rule matrix and the open-deviation
-tracker. Keep it current when the package's conformance changes.
+Deviations with a code change behind them (positional params, the strict
+analyzer block, the architecture test, example naming) are tracked in
+`BACKLOG.md`.

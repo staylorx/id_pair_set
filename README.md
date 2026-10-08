@@ -68,8 +68,7 @@ lists every rename.
 ## Standard
 
 Built to the [Dart/Flutter Bible](https://github.com/taybiz/dart-flutter-bible).
-This repo's own deviations and local wiring are in [AGENTS.md](AGENTS.md); the
-rule-by-rule conformance matrix is in [BIBLE_COMPLIANCE.md](BIBLE_COMPLIANCE.md).
+This repo's own deviations and local wiring are in [AGENTS.md](AGENTS.md).
 
 ## License
 
