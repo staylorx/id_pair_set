@@ -30,23 +30,31 @@ below are audit findings against the Dart/Flutter Bible, each flagged for later
 review and deliberately not auto-fixed, because a deviation is a place where the
 code and the Bible disagree and either side may be the wrong one.
 
-- [ ] **Deviation: lib/id_pair_set.dart** - the barrel's doc comment says what
+- [x] **Deviation: lib/id_pair_set.dart** - the barrel's doc comment says what
   the package holds but not which error style consumers get. Bible §4 ("Declare
   the error style, loudly") requires the barrel to name it; for this package the
   honest wording is "no fallible calls — nothing here throws" (README already
   states the behaviour, but not as the declaration). The Bible has no wording
   yet for a package with no failure paths, which may be the real gap.
+  **Done 2026-10-08:** barrel doc comment now declares the error style (no
+  throws, no fault tuples — malformed input is a value).
 
-- [ ] **Deviation: README.md** - same missing declaration near the top, where
+- [x] **Deviation: README.md** - same missing declaration near the top, where
   Bible §4 puts it so it is read before the first call is written. The "No
   exceptions" line sits far below, under Guarantees, as a behaviour bullet
   rather than a named style.
+  **Done 2026-10-08:** the README now names the error style in bold directly
+  under the intro, before the first call.
 
-- [ ] **Deviation: (missing) AGENTS.md** - Bible §4 requires AGENTS.md to carry
+- [x] **Deviation: (missing) AGENTS.md** - Bible §4 requires AGENTS.md to carry
   the error-style declaration whenever a package deviates from the
   `Future<Either<Failure, T>>` default. This package deviates in the strongest
   way (it presents neither tuples nor exceptions) and ships no AGENTS.md, so the
   deviation is currently undeclared at the repo level.
+  **Done 2026-10-08:** `AGENTS.md` added — doctrine pointer, the loud error-style
+  declaration, this repo's deviations, and local wiring; `BIBLE_COMPLIANCE.md`
+  added as the rule-by-rule ledger. Remaining open deviations below are
+  cross-referenced there.
 
 - [ ] **Deviation: lib/src/simple_id_pair.dart** - `SimpleIdPair(this.idType,
   this.idCode)` takes two positional parameters; Bible §2/§4 allow positional

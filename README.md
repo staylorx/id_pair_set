@@ -4,6 +4,11 @@ One thing, many identifiers. `id_pair_set` holds the ids an entity answers to �
 an ISBN, a UPC, a manufacturer's part number, your own SKU — as an immutable set
 keyed by id type, so each namespace contributes at most one code.
 
+**Error style:** this package neither throws nor returns fault tuples — a
+malformed or duplicate entry is a value, reported through `duplicates` and
+resolved by `DuplicatePolicy`. This repo's deviations and wiring are in
+[AGENTS.md](AGENTS.md).
+
 ## Why
 
 The same physical thing is named differently by everyone who touches it. A
@@ -59,6 +64,12 @@ lists every rename.
 ## Related
 
 `id_registry` builds on this package to check uniqueness across many sets.
+
+## Standard
+
+Built to the [Dart/Flutter Bible](https://github.com/taybiz/dart-flutter-bible).
+This repo's own deviations and local wiring are in [AGENTS.md](AGENTS.md); the
+rule-by-rule conformance matrix is in [BIBLE_COMPLIANCE.md](BIBLE_COMPLIANCE.md).
 
 ## License
 
