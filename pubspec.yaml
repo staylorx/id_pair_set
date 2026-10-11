@@ -55,3 +55,6 @@ melos:
     outdated:
       description: Lists dependencies with newer versions available.
       run: dart pub outdated
+    clean:deep:
+      description: Removes the deep-clean build artifacts.
+      run: melos clean
