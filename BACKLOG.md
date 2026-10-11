@@ -60,3 +60,14 @@ When complete, mark each off and include a sentence as to disposition.
   and is not a direct dependency, so nothing to do until those move. Re-check on
   the next toolchain bump.
 
+
+## Resolved
+
+- [x] **Empty top-level `lib/data/` and `lib/domain/` dirs removed (2026-10-11).**
+  They were empty, untracked, and unreferenced residue contradicting this
+  package's documented layout convention — `lib/id_pair_set.dart` is the barrel
+  over `lib/src/`, and clean-architecture data/domain layers live under
+  `lib/src/` (e.g. `lib/src/data`, `lib/src/domain`), mirroring sibling
+  `id_registry`. Kept deliberately out: reintroducing them as empty dirs adds a
+  scoped-clean-removable artifact for nothing. If a data/domain split is ever
+  needed, create it under `lib/src/`. See kanban task t_c630641e.
