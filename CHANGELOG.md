@@ -18,6 +18,14 @@ Documentation only — no source, test or packaging change.
   blob — the tree was already all-LF — so this is a prospective guard only and
   touches no existing content.
 
+### Fixed
+- Barrel `lib/id_pair_set.dart` doc now declares the error style — no throws,
+  no fault tuples; malformed input is a value. (Bible §4)
+- `README.md` now names the error style in bold directly under the intro,
+  before the first call. (Bible §4)
+- `AGENTS.md` added — doctrine pointer, the loud error-style declaration, this
+  repo's deviations, and local wiring.
+
 ## 2.0.0 - 2026-09-19
 
 Rebuilt so a catalog, a loader or a diff gate can trust the value.

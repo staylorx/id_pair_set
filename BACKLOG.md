@@ -19,41 +19,7 @@ When complete, mark each off and include a sentence as to disposition.
   repo's backlog. Auto-increment ids for a generic identifier set are only
   useful where one writer owns the namespace.
 
-## Build + Bible audit — 2026-09-24 (Windows lane, Dart SDK 3.13.1)
-
-Gate: `dart pub get`, `dart format --output=none --set-exit-if-changed .`,
-`dart analyze --fatal-infos --fatal-warnings`, `dart test`, `dart run
-example/main.dart`, `dart pub publish --dry-run` — every step exit 0, analyzer
-reports zero diagnostics of any severity, publish dry-run reports 0 warnings.
-**No build, lint, test or dependency problem found on this platform.** The items
-below are audit findings against the Dart/Flutter Bible, each flagged for later
-review and deliberately not auto-fixed, because a deviation is a place where the
-code and the Bible disagree and either side may be the wrong one.
-
-- [x] **Deviation: lib/id_pair_set.dart** - the barrel's doc comment says what
-  the package holds but not which error style consumers get. Bible §4 ("Declare
-  the error style, loudly") requires the barrel to name it; for this package the
-  honest wording is "no fallible calls — nothing here throws" (README already
-  states the behaviour, but not as the declaration). The Bible has no wording
-  yet for a package with no failure paths, which may be the real gap.
-  **Done 2026-10-08:** barrel doc comment now declares the error style (no
-  throws, no fault tuples — malformed input is a value).
-
-- [x] **Deviation: README.md** - same missing declaration near the top, where
-  Bible §4 puts it so it is read before the first call is written. The "No
-  exceptions" line sits far below, under Guarantees, as a behaviour bullet
-  rather than a named style.
-  **Done 2026-10-08:** the README now names the error style in bold directly
-  under the intro, before the first call.
-
-- [x] **Deviation: (missing) AGENTS.md** - Bible §4 requires AGENTS.md to carry
-  the error-style declaration whenever a package deviates from the
-  `Future<Either<Failure, T>>` default. This package deviates in the strongest
-  way (it presents neither tuples nor exceptions) and ships no AGENTS.md, so the
-  deviation is currently undeclared at the repo level.
-  **Done 2026-10-08:** `AGENTS.md` added — doctrine pointer, the loud error-style
-  declaration, this repo's deviations, and local wiring. The remaining open
-  deviations are the items below.
+## Bible deviations
 
 - [ ] **Deviation: lib/src/simple_id_pair.dart** - `SimpleIdPair(this.idType,
   this.idCode)` takes two positional parameters; Bible §2/§4 allow positional
@@ -87,18 +53,10 @@ code and the Bible disagree and either side may be the wrong one.
 - [ ] **Deviation: pubspec.yaml** - `equatable: ^2.1.0` is pinned while 3.0.0 is
   the latest release (`dart pub outdated`). The Bible's STACK pins `equatable
   ^2.x`, so the code follows doctrine and the doctrine is what is behind the
-  ecosystem. Decided: stay on ^2.x until the pin is revised (see CHANGELOG.md).
+  ecosystem. Stay on `^2.x` until the pin is revised (see CHANGELOG.md).
 
 - [ ] **Transitive dependency held back.** `platform` resolves to 3.1.6 with
   3.2.0 available; it arrives through the dev-dependency graph (`melos` / `test`)
   and is not a direct dependency, so nothing to do until those move. Re-check on
   the next toolchain bump.
 
-- [x] **No `.gitattributes`.** The repo sets no git-level line-ending policy, so
-  a Windows checkout that renormalizes would commit CRLF for every file. Add
-  `* text=auto eol=lf` plus one `git add --renormalize .` pass. Not a Bible rule
-  — it is this shop's house rule, so it belongs in its own commit rather than
-  folded into a docs change. **Done 2026-09-24:** `.gitattributes` added with
-  `* text=auto eol=lf`; `git add --renormalize .` touched no tracked blob (the
-  tree was already all-LF), so the change is purely prospective — no CRLF can
-  enter the index from here on.
