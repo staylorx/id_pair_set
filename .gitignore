@@ -31,5 +31,9 @@ doc/api/
 # Log files
 *.log
 
-# melos bootstrap IntelliJ module files
+# Melos IDE droppings / IDE module files
+.idea/
 *.iml
+
+# Test coverage output
+coverage/
