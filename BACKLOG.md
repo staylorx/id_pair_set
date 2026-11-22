@@ -3,7 +3,7 @@
 When complete, mark each off and include a sentence as to disposition.
 
 - [ ] **Publish 2.0.0** (`dart pub publish` from the repo root). Blocked on
-  publisher credentials — the packaging is verified by the CI publish dry-run,
+  publisher credentials — the packaging is verified by the `publish-dry` gate,
   so the publish itself is the only step left. `id_registry` depends on this
   version, so it must be published first.
 
@@ -45,7 +45,7 @@ When complete, mark each off and include a sentence as to disposition.
   Either the naming rule should allow an implicit When, or these groups get one.
 
 - [ ] **Deviation: (missing) test/architecture_test.dart** - Bible §2 and §9
-  step 7 make a `dart_arch_test` boundary + cycle test the CI hard gate over the
+  step 7 make a `dart_arch_test` boundary + cycle test a hard gate over the
   resolved import graph. The repo has neither. With a single package there are no
   package boundaries to assert, so this needs either the cycle-freedom half or an
   explicit single-package exemption written into the Bible.
