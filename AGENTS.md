@@ -31,14 +31,15 @@ it is not silence, it is the choice.
   — one package, no layer boundaries to enforce. Revisit if the package ever
   grows a second package or an I/O adapter.
 - **No persistence** — this is a value type; drift/sembast/UoW have no surface.
-- The published `example/` is sanctioned (bible: packages get a CI-tested
-  `examples/`; this package is on pub.dev).
+- The published `example/` is sanctioned (bible: packages get an `examples/`
+  the gate runs; this package is on pub.dev).
 
 ## Local wiring
 
 - **Layout:** `lib/id_pair_set.dart` is the one hand-written barrel re-exporting
   `lib/src/`; one class per file in `src/`.
-- **Gate** (CI runs the same melos scripts a human runs): `melos run
+- **Gate** (the same melos scripts a human runs — no hosted CI, no GitHub
+  Actions): `melos run
   format-check`, `melos run analyze`, `melos run test`, `melos run example` — or
   `melos run verify` for all of it. Clean = **zero diagnostics of any severity**
   (`dart analyze --fatal-infos --fatal-warnings`).
