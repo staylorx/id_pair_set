@@ -48,7 +48,7 @@ to duplicate by accident.
 
 ## Usage
 
-The runnable example is `example/main.dart` (CI runs it on every push), and the
+The runnable example is `example/main.dart` (the gate runs it before every push), and the
 tests in `test/` are the reference for every behaviour above.
 
 Add `id_pair_set: ^2.0.0` to your pubspec.
